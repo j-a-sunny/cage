@@ -1,17 +1,18 @@
-{ lib
-, stdenv
-, fetchurl
-, autoPatchelfHook
-, makeWrapper
-, libxkbcommon
-, libglvnd
-, mesa
-, vulkan-loader
-, udev
-, seatd
-, libinput
-, wayland
-, xwayland
+{
+  lib,
+  stdenv,
+  fetchurl,
+  autoPatchelfHook,
+  makeWrapper,
+  libxkbcommon,
+  libglvnd,
+  mesa,
+  vulkan-loader,
+  udev,
+  seatd,
+  libinput,
+  wayland,
+  xwayland,
 }:
 
 let
@@ -28,7 +29,9 @@ let
     };
   };
 
-  srcInfo = sources.${stdenv.hostPlatform.system} or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
+  srcInfo =
+    sources.${stdenv.hostPlatform.system}
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}");
 in
 stdenv.mkDerivation {
   pname = "cage-waydroid-helper";
@@ -72,7 +75,10 @@ stdenv.mkDerivation {
     description = "A Wayland kiosk (waydroid-helper fork) binary release";
     homepage = "https://github.com/waydroid-helper/cage";
     license = licenses.mit;
-    platforms = [ "x86_64-linux" "aarch64-linux" ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
     mainProgram = "cage-waydroid-helper";
   };
 }
