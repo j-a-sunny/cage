@@ -2,6 +2,8 @@
 build/
 build-*/
 set/
+result
+result-*
 
 # Meson build system
 .meson-subproject-wrap-hash.txt

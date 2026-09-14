@@ -46,6 +46,70 @@ KMS+DRM backend. In debug mode (default build type with Meson), press
 
 Cage is based on the annotated source of tinywl and rootston.
 
+## Nix / NixOS (Flake)
+
+This repository provides a Nix Flake that packages the pre-built binary release (`cage-waydroid-helper`) with `autoPatchelfHook` and `xwayland` runtime integration. The binary and package are named `cage-waydroid-helper` to avoid collisions with standard upstream `cage`.
+
+### Run or Shell
+
+Run directly without installing:
+```bash
+# Run cage-waydroid-helper
+nix run github:j-a-sunny/cage -- --help
+
+# Or locally from the repo directory
+nix run .#cage-waydroid-helper -- --help
+```
+
+Or launch an ephemeral shell:
+```bash
+nix shell github:j-a-sunny/cage
+cage-waydroid-helper --help
+```
+
+### Install in NixOS (`flake.nix`)
+
+Add `cage-waydroid-helper` as a flake input in your NixOS configuration:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    cage-waydroid-helper.url = "github:j-a-sunny/cage";
+  };
+
+  outputs = { self, nixpkgs, cage-waydroid-helper, ... }: {
+    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux"; # or "aarch64-linux"
+      modules = [
+        ./configuration.nix
+
+        # Option A: Add to systemPackages directly
+        ({ pkgs, ... }: {
+          environment.systemPackages = [
+            cage-waydroid-helper.packages.${pkgs.system}.default
+          ];
+        })
+
+        # Option B: Use the provided NixOS module
+        # cage-waydroid-helper.nixosModules.default
+        # {
+        #   programs.cage-waydroid-helper.enable = true;
+        # }
+      ];
+    };
+  };
+}
+```
+
+### Traditional Nix (`nix-build`)
+
+You can also build the package using `default.nix`:
+```bash
+nix-build
+./result/bin/cage-waydroid-helper --help
+```
+
 ## Bugs
 
 For any bug, please [create an
