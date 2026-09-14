@@ -122,3 +122,35 @@ jobs:
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Checkout code for flake update
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+
+    - name: Update package.nix checksums
+      run: |
+        VERSION="${{ steps.timestamp.outputs.timestamp }}"
+        HASH_AMD64=$(sha256sum release/cage-waydroid-helper_${VERSION}_amd64 | awk '{print $1}' | xxd -r -p | base64)
+        HASH_ARM64=$(sha256sum release/cage-waydroid-helper_${VERSION}_arm64 | awk '{print $1}' | xxd -r -p | base64)
+        
+        SRI_AMD64="sha256-${HASH_AMD64}"
+        SRI_ARM64="sha256-${HASH_ARM64}"
+        
+        sed -i -e "s|version = \".*\";|version = \"${VERSION}\";|" package.nix
+        
+        awk -v amd="$SRI_AMD64" -v arm="$SRI_ARM64" '
+          /x86_64-linux = \{/ { in_x86 = 1 }
+          /aarch64-linux = \{/ { in_arm = 1 }
+          in_x86 && /hash =/ { sub(/hash = ".*"/, "hash = \"" amd "\""); in_x86 = 0 }
+          in_arm && /hash =/ { sub(/hash = ".*"/, "hash = \"" arm "\""); in_arm = 0 }
+          { print }
+        ' package.nix > package.nix.tmp && mv package.nix.tmp package.nix
+
+    - name: Commit and push flake update
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add package.nix
+        git commit -m "Update flake checksums for release-${{ steps.timestamp.outputs.timestamp }} [skip ci]"
+        git push
