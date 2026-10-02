@@ -16,16 +16,16 @@
 }:
 
 let
-  version = "202511191018";
+  version = "202610022129";
 
   sources = {
     x86_64-linux = {
       url = "https://github.com/waydroid-helper/cage/releases/download/release-${version}/cage-waydroid-helper_${version}_amd64";
-      hash = "sha256-1Vky6JmgeMpz8FTYARiorQR+jzKWC9tD9K+39TmxqDE=";
+      hash = "sha256-";
     };
     aarch64-linux = {
       url = "https://github.com/waydroid-helper/cage/releases/download/release-${version}/cage-waydroid-helper_${version}_arm64";
-      hash = "sha256-ROk25LJfh8okFu6cigkqc3WUjWBx3j0Sa/E64t+CAzc=";
+      hash = "sha256-";
     };
   };
 
